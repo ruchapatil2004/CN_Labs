@@ -1,0 +1,47 @@
+Server :-
+
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+
+public class UDPServer{
+    public static void main(String[] args){
+        try{
+            DatagramSocket serverSocket = new DatagramSocket(9836);
+            System.out.println("UDP Server is running...");
+            byte[]  receiveData = new byte[1024];
+            while(true){
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                serverSocket.receive(receivePacket);
+                String message = new String(receivePacket.getData(), 0, receivePacket.getLength());
+                System.out.println("Received from Client: " + message);
+                System.out.println("Client IP: " + receivePacket.getAddress() + ",Port: " + receivePacket.getPort());
+                receiveData = new byte[1024];
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+}
+
+Client :-
+
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
+public class UDPClient{
+    public static void main(String[] args){
+        try{
+            InetAddress serverAddress = InetAddress.getByName("localhost");
+            DatagramSocket clientSocket = new DatagramSocket();
+            String message = "Hello, UDP Server";
+            byte[] sendData = message.getBytes();
+            DatagramPacket sendPacket = new DatagramPacket (sendData, sendData.length, serverAddress, 9836);
+            clientSocket.send(sendPacket);
+            System.out.println("Message sent to server: "+ message);
+            clientSocket.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+}

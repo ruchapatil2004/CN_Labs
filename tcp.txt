@@ -1,0 +1,47 @@
+Server:-
+import java.io.*;
+import java.net.*;
+
+public class TCPServer{
+    public static void main(String[] args){
+        try{
+            ServerSocket serverSocket = new ServerSocket(12345);
+            System.out.println("Server is listening on port 12345");
+            Socket clientSocket = serverSocket.accept();
+            System.out.println("Client Connected:" + clientSocket.getInetAddress());
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            String clientMessage = in.readLine();
+            System.out.println("Client says: " + clientMessage);
+            out.println("Server received: "+ clientMessage);
+            in.close();
+            out.close();
+            clientSocket.close();
+            serverSocket.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+}
+
+Client :-
+import java.io.*;
+import java.net.*;
+
+public class TCPClient{
+    public static void main(String[] args){
+        try{
+            Socket cs = new Socket("localhost", 12345);
+            BufferedReader in = new BufferedReader(new InputStreamReader(cs.getInputStream()));
+            PrintWriter out = new PrintWriter(cs.getOutputStream(), true);
+            out.println("Hello, Server!");
+            String serverResponse = in.readLine();
+            System.out.println("Server Response: "+ serverResponse);
+            in.close();
+            out.close();
+            cs.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+}

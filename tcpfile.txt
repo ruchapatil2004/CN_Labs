@@ -1,0 +1,59 @@
+Server :-
+
+import java.io.*;
+import java.net.*;
+public class myserver {
+    public static void main(String[] args) {
+        try (ServerSocket serverSocket = new ServerSocket(5000);
+             Socket clientSocket = serverSocket.accept();
+             DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream())) {
+            System.out.println(clientSocket + " connected.");
+            String filename = dataInputStream.readUTF();
+            File file = new File("sreceive" + filename);
+            long fileSize = dataInputStream.readLong();
+            try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                byte[] buffer = new byte[4 * 1024];
+                int bytesRead;
+                while (fileSize > 0 && (bytesRead = dataInputStream.read(buffer)) != -1) {
+                    fileOutputStream.write(buffer, 0, bytesRead);
+                    fileSize -= bytesRead;
+                }
+            }
+            System.out.println("File Received and saved as: " + file.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+Client :-
+
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+public class myclient {
+    public static void main(String[] args) {
+        try (Socket socket = new Socket("localhost", 5000);
+            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream())) {
+            Scanner input = new Scanner(System.in);
+            System.out.println("Enter File Name with extension: ");
+            String filename = input.nextLine();
+            dataOutputStream.writeUTF(filename);
+            File file = new File(filename);
+            long fileSize = file.length();
+            dataOutputStream.writeLong(fileSize);
+            try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                byte[] buffer = new byte[4 * 1024];
+                int bytesRead;
+                while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                    dataOutputStream.write(buffer, 0, bytesRead);
+                }
+            }
+            System.out.println("File Sent");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+

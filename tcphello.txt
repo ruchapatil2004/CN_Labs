@@ -1,0 +1,88 @@
+Server :-
+import java.io.*;
+import java.net.*;
+public class TCPServer1 {
+    public static void main(String[] args) {
+        try {
+            ServerSocket ss = new ServerSocket(100);
+            System.out.println("Server is listening on port 100");
+            Socket cs = ss.accept(); 
+            System.out.println("Client is connected");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(cs.getInputStream()));
+            PrintWriter out = new PrintWriter(cs.getOutputStream(),true);
+
+            String clientMessage;
+            while(true){
+                clientMessage = in.readLine(); 
+                System.out.println("Client Says: " + clientMessage);
+                if(clientMessage.equalsIgnoreCase("end")){
+                    System.out.println("Chat ended by client.");
+                    break;
+                }
+                
+                BufferedReader serverReader = new BufferedReader(new InputStreamReader(System.in));
+                System.out.print("Server: ");
+                String serverMessage = serverReader.readLine();
+                out.println(serverMessage); 
+
+                if (serverMessage.equalsIgnoreCase("end")) {
+                    System.out.println("Chat ended by server.");
+                    break;
+                }
+            } 
+            in.close();
+            out.close();
+            cs.close();
+            ss.close();
+        } 
+        catch (IOException e) { 
+            e.printStackTrace();
+        }
+    }
+}
+
+
+Client :-
+
+import java.io.*;
+import java.net.*;
+public class TCPClient1 {
+    public static void main(String[] args) {
+        try {
+            Socket cs = new Socket("localhost", 100);
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(cs.getInputStream()));
+            PrintWriter out = new PrintWriter(cs.getOutputStream(), true);
+
+            BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
+            
+            String clientMessage;
+            while (true) {
+                System.out.print("Client: ");
+                clientMessage = consoleReader.readLine();
+                out.println(clientMessage);
+
+                if (clientMessage.equalsIgnoreCase("end")) {
+                    System.out.println("Chat ended by client.");
+                    break;
+                }
+
+                String serverMessage = in.readLine();
+                System.out.println("Server Says: " + serverMessage);
+
+                if (serverMessage.equalsIgnoreCase("end")) {
+                    System.out.println("Chat ended by server.");
+                    break;
+                }
+            }
+
+            in.close(); 
+            cs.close(); 
+            cs.close();
+        } 
+        catch (IOException e) { 
+            e.printStackTrace();
+        }
+    }
+}
